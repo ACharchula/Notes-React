@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { Link } from 'react-router-dom';
 
 class NotesMenu extends PureComponent {
     constructor(props) {
@@ -11,7 +12,15 @@ class NotesMenu extends PureComponent {
 
     render() {
         return (
-            
+            <div>
+                <h1>NotesMenu</h1>
+                <Link to={'/notes/edit/0'}>
+                    <button type="button" class="btn btn-primary">Edit</button>
+                </Link>
+                <Link to={'/notes/create'}>
+                    <button type="button" class="btn btn-primary">Create</button>
+                </Link>
+            </div>
         )
     }
 }

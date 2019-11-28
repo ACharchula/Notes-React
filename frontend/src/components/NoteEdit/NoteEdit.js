@@ -11,7 +11,7 @@ class NoteEdit extends PureComponent {
 
     render() {
         return (
-            
+            <h1>NoteEdit</h1>
         )
     }
 }

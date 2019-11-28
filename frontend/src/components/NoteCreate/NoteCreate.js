@@ -11,7 +11,7 @@ class NoteCreate extends PureComponent {
 
     render() {
         return (
-            
+            <h1>NoteCreate</h1>
         )
     }
 }
