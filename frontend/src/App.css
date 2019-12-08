@@ -20,3 +20,30 @@
 .App-link {
   color: #09d3ac;
 }
+
+.App-Container {
+  margin-top: 50px;
+  box-shadow: 6px 6px 5px 0px rgba(117,117,117,1);
+  border-radius: 10px;
+  background-color: white;
+}
+
+.margin-right {
+  margin-right: 10px;
+}
+
+.margin-bottom {
+  margin-bottom: 10px;
+}
+
+.padding-bottom {
+  padding-bottom: 10px;
+}
+
+.padding-top {
+  padding-top: 10px;
+}
+
+.col-width {
+  width: 25%;
+}

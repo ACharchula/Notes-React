@@ -1,4 +1,6 @@
 import React, { PureComponent } from 'react'
+import '../../App.css';
+import NoteEditor from '../NoteEditor/NoteEditor';
 
 class NoteCreate extends PureComponent {
     constructor(props) {
@@ -11,7 +13,7 @@ class NoteCreate extends PureComponent {
 
     render() {
         return (
-            <h1>NoteCreate</h1>
+            <NoteEditor mode="create"/>
         )
     }
 }
