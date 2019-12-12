@@ -36,18 +36,22 @@ class NoteEditor extends PureComponent {
                
             <div className="row">
                 
-                <ul className="list-group col-md-4">
+                <div className="col-md-4">
+                    <ul className="list-group categories">
+                    <li className="list-group-item">1</li>
+                    <li className="list-group-item">1</li>
+                    <li className="list-group-item">1</li>
+                    <li className="list-group-item">1</li>
                     <li className="list-group-item">1</li>
                 </ul>
-                
-                <div className="form-group form-inline col-md-5">
-                    <label className="control-label px-2">Category name:</label>
-                    <input type="text" className="form-control" name="category" id="category"/>
                 </div>
                 
-                <div class="form-group col-md-3">
-                    <button className="btn btn-primary" type="submit" name="submitButton" value="Add" >Add</button>
-                    <button className="btn btn-primary" type="submit" name="submitButton" value="Remove">Remove</button>
+                <div className="form-group form-inline col-md-8">
+                    <label className="control-label px-2">Category name:</label>
+                    <input type="text" className="form-control" name="category" id="category"/>
+     
+                    <button className="margin-left btn btn-outline-secondary" type="submit" name="submitButton" value="Add" >Add</button>
+                    <button className="margin-left btn btn-outline-secondary" type="submit" name="submitButton" value="Remove">Remove</button>
         
                 </div>
             
@@ -55,9 +59,9 @@ class NoteEditor extends PureComponent {
         
 
                 <div className="form-group padding-top padding-bottom">
-                    <button type="button" class="btn btn-primary margin-right">Submit</button>
+                    <button type="button" className="btn btn-primary margin-right">Submit</button>
                     <Link to={'/'}>
-                        <button type="button" class="btn btn-secondary">Cancel</button>
+                        <button type="button" className="btn btn-secondary">Cancel</button>
                     </Link>
                 </div>
             </div>

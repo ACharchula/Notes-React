@@ -32,8 +32,8 @@ class NotesMenu extends PureComponent {
                     </div>
 
                     <div className="form-inline form-group col-md-3">
-                        <button type="button" class="btn btn-primary margin-right">Primary</button>
-                        <button type="button" class="btn btn-secondary">Secondary</button>
+                        <button type="button" class="btn btn-secondary margin-right">Filter</button>
+                        <button type="button" class="btn btn-secondary">Cancel</button>
                     </div>
                 </div>
 
@@ -51,16 +51,23 @@ class NotesMenu extends PureComponent {
                             <td>title</td>
                             <td>
                                 <Link to={'/notes/edit/1'}>
-                                    <button type="button" class="btn btn-outline-dark margin-right">Edit</button>
+                                    <button type="button" class="btn btn-outline-secondary margin-right">Edit</button>
                                 </Link>
-                                <button type="button" class="btn btn-outline-dark">Delete</button>
+                                <button type="button" class="btn btn-outline-secondary">Delete</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
-                <Link to={'/notes/create'}>
-                    <button type="button" class="btn margin-bottom btn-primary">Create</button>
-                </Link>
+                <div className="footer">
+                    <Link to={'/notes/create'}>
+                        <button type="button" class="btn margin-bottom btn-primary">Create</button>
+                    </Link>
+                    <ul className="to-right pagination">
+                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                        <li class="page-item page-link">1 / 1</li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                </div>
             </div>
 
             

@@ -26,10 +26,28 @@
   box-shadow: 6px 6px 5px 0px rgba(117,117,117,1);
   border-radius: 10px;
   background-color: white;
+  max-height: 500px;
 }
 
 .margin-right {
   margin-right: 10px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.footer {
+  display: flex;
+}
+
+.to-right {
+  margin-left: auto;
+}
+
+.margin-left {
+  margin-left: 10px;
 }
 
 .margin-bottom {
@@ -46,4 +64,11 @@
 
 .col-width {
   width: 25%;
+}
+
+.categories {
+  max-height: 150px;
+  overflow-x: auto;
+  overflow-y: auto;
+  margin-top: 10px;
 }
