@@ -13,7 +13,7 @@ class NoteEdit extends PureComponent {
 
     render() {
         return (
-            <NoteEditor mode="edit"/>
+            <NoteEditor mode='edit'/>
         )
     }
 }

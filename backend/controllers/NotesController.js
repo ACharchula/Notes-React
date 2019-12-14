@@ -34,7 +34,7 @@ exports.getAllNotes = (req, res) => {
 
     const notesForPage = filteredNotes.splice(pager.startIndex, PageSize);
 
-    res.send({pager: pager, notes: notesForPage, categories: notes.categories});
+    res.send( { data: {pager: pager, notes: notesForPage, categories: notes.categories}});
 }
 
 exports.getNote = (req, res) => {

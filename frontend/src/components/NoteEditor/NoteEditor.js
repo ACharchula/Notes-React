@@ -1,57 +1,192 @@
 import React, { PureComponent } from 'react'
 import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router';
+import axios from 'axios';
 
+const api = 'http://localhost:8080/rest_api';
 
 class NoteEditor extends PureComponent {
     constructor(props) {
         super(props)
 
         this.state = {
-            
+            title: '',
+            date: '',
+            markdown: false,
+            content: '',
+            categories: [],
+            category: '',
+            oldTitle: this.props.match.params.id || ''
+        }
+
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleTitleChange = this.handleTitleChange.bind(this);
+        this.handleDateChange = this.handleDateChange.bind(this);
+        this.handleMarkdownChange = this.handleMarkdownChange.bind(this);
+        this.handleContentChange = this.handleContentChange.bind(this);
+        this.handleCategoryInputChange = this.handleCategoryInputChange.bind(this);
+        this.addCategory = this.addCategory.bind(this);
+        this.removeCategory = this.removeCategory.bind(this);
+    }
+
+    componentDidMount() {
+        if (this.state.oldTitle !== '') {
+            axios.get(`${api}/note/${this.state.oldTitle}`).then(res => {
+                const categories = res.data.note.categories[0] == '' ? [] : res.data.note.categories;
+
+                this.setState({
+                    title: res.data.note.title,
+                    date: res.data.note.date,
+                    categories: categories,
+                    markdown: res.data.note.markdown,
+                    content: res.data.note.content
+                })
+            }).catch(err => {
+                console.log(err);
+            })
+        }
+    }
+
+    handleTitleChange(event) {
+        this.setState({title: event.target.value})
+    }
+
+    handleDateChange(event) {
+        this.setState({date: event.target.value})
+    }
+
+    handleMarkdownChange(event) {
+        this.setState({markdown: event.target.checked})
+    }
+
+    handleContentChange(event) {
+        this.setState({content: event.target.value})
+    }
+
+    handleCategoryInputChange(event) {
+        this.setState({category: event.target.value})
+    }
+
+    addCategory() {
+        const categories = this.state.categories;
+        const category = this.state.category
+        if (category !== '' && !categories.includes(category)) {
+            categories.push(category);
+            this.setState({
+                category: '',
+                categories: categories
+            });
+        } else {
+            alert('Cannot add empty or already existing category!');
+            this.setState({
+                category: '',
+            });
+        }
+    }
+
+    removeCategory() {
+        const categories = this.state.categories;
+        const category = this.state.category;
+        if (category !== '' && categories.includes(category)) {
+            categories.splice(categories.indexOf(category), 1);
+            this.setState({
+                category: '',
+                categories: categories 
+            });
+        } else {
+            alert('Cannot remove empty or not existing category!');
+            this.setState({
+                category: ''
+            });
+        }
+    }
+
+    handleSubmit(event) {
+        event.preventDefault();
+        
+        if (this.state.title === '') {
+            alert('Title cannot be empty!');
+            return;
+        } else if (this.state.date === '') {
+            alert('Date cannot be empty!');
+            return;
+        }
+
+        if (this.props.mode === 'create') {
+            axios.post(`${api}/save_note`, {
+                title: this.state.title,
+                date: this.state.date,
+                markdown: this.state.markdown,
+                content: this.state.content,
+                categories: this.state.categories
+            }).then(res => {
+                if (res.data !== 'Saved') {
+                    alert(res.data)
+                } else {
+                    this.props.history.push('/');
+                }
+            }).catch(err => {
+                console.log(err);
+            })
+        } else if (this.props.mode === 'edit') {
+            axios.put(`${api}/update_note/${this.state.oldTitle}`, {
+                title: this.state.title,
+                date: this.state.date,
+                markdown: this.state.markdown,
+                content: this.state.content,
+                categories: this.state.categories
+            }).then(res => {
+                if (res.data !== 'Updated') {
+                    alert(res.data)
+                } else {
+                    this.props.history.push('/');
+                }
+            }).catch(err => {
+                console.log(err);
+            })
         }
     }
 
     render() {
         return (
             <div className="App-Container container padding-top">
+                <form onSubmit={this.handleSubmit}>
                 <div className="row">
                     <div className="form-inline form-group col-md-5">
                         <label className="control-label px-2">Title of the note:</label>
-                        <input type="text" className="form-control"/>
+                        <input type="text" value={this.state.title} onChange={this.handleTitleChange} className="form-control"/>
                     </div>
                     <div className="form-inline form-group col-md-3">
                         <label className="control-label px-2">Date:</label>
-                        <input className="form-control" name="date" type="date"/>
+                        <input className="form-control" value={this.state.date} onChange={this.handleDateChange} type="date"/>
                     </div>
                     <div className="form-group form-inline col-md-2">
                         <div className="form-check">
-                            <input className="form-check-input" type="checkbox"/>
-                            <label className="form-check-label">Markdown</label>
+                            <input className="form-check-input" checked={this.state.markdown} onChange={this.handleMarkdownChange} type="checkbox"/>
+                            <label className="form-check-label" >Markdown</label>
                         </div>
                     </div>
                 </div>
                 
-                <textarea className="form-control" rows="8"/>
+                <textarea value={this.state.content} className="form-control" onChange={this.handleContentChange} rows="8"/>
 
                
             <div className="row">
                 
                 <div className="col-md-4">
                     <ul className="list-group categories">
-                    <li className="list-group-item">1</li>
-                    <li className="list-group-item">1</li>
-                    <li className="list-group-item">1</li>
-                    <li className="list-group-item">1</li>
-                    <li className="list-group-item">1</li>
-                </ul>
+                        {this.state.categories.map( (name, index) => {
+                        return <li className="list-group-item" key={index}>{name}</li>
+                        })}
+                    </ul>
                 </div>
                 
                 <div className="form-group form-inline col-md-8">
                     <label className="control-label px-2">Category name:</label>
-                    <input type="text" className="form-control" name="category" id="category"/>
+                    <input type="text" value={this.state.category} className="form-control" id="category" onChange={this.handleCategoryInputChange}/>
      
-                    <button className="margin-left btn btn-outline-secondary" type="submit" name="submitButton" value="Add" >Add</button>
-                    <button className="margin-left btn btn-outline-secondary" type="submit" name="submitButton" value="Remove">Remove</button>
+                    <button type="button" className="margin-left btn btn-outline-secondary" onClick={this.addCategory}>Add</button>
+                    <button type="button" className="margin-left btn btn-outline-secondary" onClick={this.removeCategory}>Remove</button>
         
                 </div>
             
@@ -59,14 +194,16 @@ class NoteEditor extends PureComponent {
         
 
                 <div className="form-group padding-top padding-bottom">
-                    <button type="button" className="btn btn-primary margin-right">Submit</button>
+                    <button type="submit" id="Submit" className="btn btn-primary margin-right">Submit</button>
                     <Link to={'/'}>
                         <button type="button" className="btn btn-secondary">Cancel</button>
                     </Link>
                 </div>
+
+                </form>
             </div>
         )
     }
 }
 
-export default NoteEditor
+export default withRouter(NoteEditor);
