@@ -32,7 +32,7 @@ class NoteEditor extends PureComponent {
     componentDidMount() {
         if (this.state.oldTitle !== '') {
             axios.get(`${api}/note/${this.state.oldTitle}`).then(res => {
-                const categories = res.data.note.categories[0] == '' ? [] : res.data.note.categories;
+                const categories = res.data.note.categories[0] === '' ? [] : res.data.note.categories;
 
                 this.setState({
                     title: res.data.note.title,

@@ -27,7 +27,7 @@ module.exports = class FileNoteRepository {
                     }
                 });
             }
-            
+            note.categories = categories;
             note.date = date;
             return note; //ommiting content because we don't need it
         });

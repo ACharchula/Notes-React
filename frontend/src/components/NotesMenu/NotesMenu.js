@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { Link } from 'react-router-dom';
 import '../../App.css';
 import Axios from 'axios';
+import moment from 'moment';
 
 const api = 'http://localhost:8080/rest_api';
 
@@ -11,16 +12,56 @@ class NotesMenu extends PureComponent {
 
         this.state = {
             notes: [],
-            categories: []
+            categories: [],
+            fromFilter: '',
+            toFilter: '',
+            categoryFilter: 'All',
+            currentPage: 1,
+            allPages: 1
         }
+
+        this.setFromFilter = this.setFromFilter.bind(this);
+        this.setToFilter = this.setToFilter.bind(this);
+        this.setCategoryFilter = this.setCategoryFilter.bind(this);
+        this.filter = this.filter.bind(this);
+        this.previousPage = this.previousPage.bind(this);
+        this.nextPage = this.nextPage.bind(this);
     }
 
     componentDidMount() {
-        Axios.get(`${api}/all_notes`).then(res => {
+        const category = localStorage.getItem('categoryFilter');
+        const from = localStorage.getItem('fromFilter');
+        const to = localStorage.getItem('toFilter');
+        const currentPage = localStorage.getItem('currentPage');
+
+        if (category !== undefined) {
+            this.setState({categoryFilter: category});
+        }
+
+        if (from !== undefined) {
+            this.setState({fromFilter: from});
+        }
+
+        if (to !== undefined) {
+            this.setState({toFilter: to});
+        }
+
+        if (currentPage !== undefined) {
+            this.setState({currentPage: currentPage});
+        }
+
+        this.getNotes(from, to, category, currentPage);
+    }
+
+    getNotes(from, to, category, page) {
+        Axios.get(`${api}/all_notes?from=${from}&to=${to}&category=${category}&page=${page}`).then(res => {
             this.setState({
                 notes: res.data.data.notes,
-                categories: res.data.data.categories
+                categories: res.data.data.categories,
+                currentPage: res.data.data.pager.currentPage,
+                allPages: res.data.data.pager.totalPages
             })
+            localStorage.setItem('currentPage', res.data.data.pager.currentPage);
         }).catch(err => {
             console.log(err);
         })
@@ -31,43 +72,104 @@ class NotesMenu extends PureComponent {
             if (res.data !== 'Deleted') {
                 alert(res.data)
             } else {
-                this.componentDidMount();
+                if (this.state.allPages === 1 && this.state.categoryFilter !== 'All' && this.state.notes.length === 1) {
+                    this.setState({categoryFilter: 'All'});
+                    localStorage.setItem('categoryFilter', 'All');
+                }
+                this.getNotes(this.state.fromFilter, this.state.toFilter, this.state.categoryFilter, 1);
             }
         }).catch(err => {
             console.log(err);
         })
     }
 
+
+    setFromFilter(event) {
+        localStorage.setItem('fromFilter', event.target.value);
+        if (event.target.value !== undefined) {
+            this.setState({fromFilter: event.target.value})
+        }
+    }
+
+    setToFilter(event) {
+        localStorage.setItem('toFilter', event.target.value);
+        if (event.target.value !== undefined) {
+            this.setState({toFilter: event.target.value})
+        }
+    }
+
+    setCategoryFilter(event) {
+        localStorage.setItem('categoryFilter', event.target.value);
+        if (event.target.value !== undefined) {
+            this.setState({categoryFilter: event.target.value})
+        }
+    }
+
+    filter(event) {
+        event.preventDefault();
+
+        if ((this.state.fromFilter === '' && this.state.toFilter !== '') || (this. state.fromFilter !== '' && this.state.toFilter === '')) {
+            alert('Please insert both dates (from and to) or keep both empty.')
+        } else if (this.state.fromFilter !== '' && !moment(this.state.fromFilter, 'YYYY-MM-DD').isSameOrBefore(moment(this.state.toFilter, 'YYYY-MM-DD'))) {
+            alert("Please insert 'from' date which is before or equals 'to' date")
+        } else {
+            this.getNotes(this.state.fromFilter, this.state.toFilter, this.state.categoryFilter, 1);
+        }
+    }
+
+    cancel() {
+        localStorage.setItem('fromFilter', '');
+        localStorage.setItem('toFilter', '');
+        localStorage.setItem('categoryFilter', 'All');
+        this.setState({
+            fromFilter: '',
+            toFilter: '',
+            categoryFilter: 'All',
+            currentPage: 1
+        })
+        this.getNotes('','', 'All', 1);
+    }
+
+    previousPage() {
+        this.getNotes(this.state.fromFilter, this.state.toFilter, this.state.categoryFilter, this.state.currentPage-1);
+    }
+
+    nextPage() {
+        this.getNotes(this.state.fromFilter, this.state.toFilter, this.state.categoryFilter, this.state.currentPage+1);
+    }
+
     render() {
         return (
             <div className="App-Container container">
-                <div className="row padding-top">
-                    <div className="form-inline form-group col-md-3">
-                        <span className="px-2">From:</span>
-                        <input className="form-control" name="fromDate" type="date"/>
-                    </div>
-                    <div className="form-inline form-group col-md-3">
-                        <span className="px-2">To:</span>
-                        <input className="form-control" name="toDate" type="date"/>
-                    </div>
+                <form onSubmit={this.filter}>
+                    <div className="row padding-top">
+                        <div className="form-inline form-group col-md-3">
+                            <span className="px-2">From:</span>
+                            <input className="form-control" type="date" value={this.state.fromFilter} onChange={this.setFromFilter}/>
+                        </div>
+                        <div className="form-inline form-group col-md-3">
+                            <span className="px-2">To:</span>
+                            <input className="form-control" type="date" value={this.state.toFilter} onChange={this.setToFilter}/>
+                        </div>
 
-                    <div className="form-inline form-group col-md-3">
-                        <span className="px-2">Category:</span>
-                        <select name="category" className="form-control">
-                            <option>All</option>
-                            {
-                                this.state.categories.map( (name, index) => {
-                                    return <option key={index}>{name}</option>
-                                })
-                            }
-                        </select>
-                    </div>
+                        <div className="form-inline form-group col-md-3">
+                            <span className="px-2">Category:</span>
+                            <select name="category" className="form-control" value={this.state.categoryFilter} onChange={this.setCategoryFilter}>
+                                <option>All</option>
+                                {
+                                    this.state.categories.map( (name, index) => {
+                                        return <option key={index} value={name}>{name}</option>
+                                    })
+                                }
+                            </select>
+                        </div>
 
-                    <div className="form-inline form-group col-md-3">
-                        <button type="button" className="btn btn-secondary margin-right">Filter</button>
-                        <button type="button" className="btn btn-secondary">Cancel</button>
+                        <div className="form-inline form-group col-md-3">
+                            <button type="submit" className="btn btn-secondary margin-right">Filter</button>
+                            <button type="button" className="btn btn-secondary" onClick={() => this.cancel()}>Cancel</button>
+                        </div>
                     </div>
-                </div>
+                </form>
 
                 <table className="table table-hover">
                     <thead>
@@ -99,9 +201,9 @@ class NotesMenu extends PureComponent {
                         <button type="button" className="btn margin-bottom btn-primary">Create</button>
                     </Link>
                     <ul className="to-right pagination">
-                        <li className="page-item"><a className="page-link" href="#">Previous</a></li>
-                        <li className="page-item page-link">1 / 1</li>
-                        <li className="page-item"><a className="page-link" href="#">Next</a></li>
+                        <li className="page-item"><button type="button" disabled={this.state.currentPage === 1} className="page-link" onClick={() => this.previousPage()}>Previous</button></li>
+                        <li className="page-item page-link">{this.state.currentPage}/{this.state.allPages}</li>
+                        <li className="page-item"><button type="button" disabled={this.state.currentPage === this.state.allPages} className="page-link" onClick={() => this.nextPage()}>Next</button></li>
                     </ul>
                 </div>
             </div>
