@@ -29,12 +29,28 @@ class NotesMenu extends PureComponent {
     }
 
     componentDidMount() {
-        const category = localStorage.getItem('categoryFilter');
-        const from = localStorage.getItem('fromFilter');
-        const to = localStorage.getItem('toFilter');
-        const currentPage = localStorage.getItem('currentPage');
+        const category = this.category();
+        const from = this.from();
+        const to = this.to();
+        const currentPage = this.currentPage();
 
         this.getNotes(from, to, category, currentPage);
+    }
+
+    from() {
+        return localStorage.getItem('fromFilter');
+    }
+
+    to() {
+        return localStorage.getItem('toFilter');
+    }
+
+    currentPage() {
+        return localStorage.getItem('currentPage');
+    }
+
+    category() {
+        return localStorage.getItem('categoryFilter');
     }
 
     getNotes(from, to, category, page) {
@@ -66,7 +82,7 @@ class NotesMenu extends PureComponent {
             if (res.data !== 'Deleted') {
                 alert(res.data)
             } else {
-                this.getNotes(this.state.fromFilter, this.state.toFilter, this.state.categoryFilter, this.state.currentPage);
+                this.getNotes(this.from(), this.to(), this.category(), this.currentPage());
             }
         }).catch(err => {
             console.log(err);
@@ -109,11 +125,11 @@ class NotesMenu extends PureComponent {
     }
 
     previousPage() {
-        this.getNotes(this.state.fromFilter, this.state.toFilter, this.state.categoryFilter, this.state.currentPage-1);
+        this.getNotes(this.from(), this.to(), this.category(), this.state.currentPage-1);
     }
 
     nextPage() {
-        this.getNotes(this.state.fromFilter, this.state.toFilter, this.state.categoryFilter, this.state.currentPage+1);
+        this.getNotes(this.from(), this.to(), this.category(), this.state.currentPage+1);
     }
 
     render() {
