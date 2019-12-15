@@ -16,8 +16,8 @@ class NotesMenu extends PureComponent {
             fromFilter: '',
             toFilter: '',
             categoryFilter: 'All',
-            currentPage: 1,
-            allPages: 1
+            currentPage: 0,
+            allPages: 0
         }
 
         this.setFromFilter = this.setFromFilter.bind(this);
@@ -34,22 +34,6 @@ class NotesMenu extends PureComponent {
         const to = localStorage.getItem('toFilter');
         const currentPage = localStorage.getItem('currentPage');
 
-        if (category !== undefined) {
-            this.setState({categoryFilter: category});
-        }
-
-        if (from !== undefined) {
-            this.setState({fromFilter: from});
-        }
-
-        if (to !== undefined) {
-            this.setState({toFilter: to});
-        }
-
-        if (currentPage !== undefined) {
-            this.setState({currentPage: currentPage});
-        }
-
         this.getNotes(from, to, category, currentPage);
     }
 
@@ -59,9 +43,19 @@ class NotesMenu extends PureComponent {
                 notes: res.data.data.notes,
                 categories: res.data.data.categories,
                 currentPage: res.data.data.pager.currentPage,
-                allPages: res.data.data.pager.totalPages
+                allPages: res.data.data.pager.totalPages,
+                fromFilter: from,
+                toFilter: to,
+                categoryFilter: category
             })
+            localStorage.setItem('categoryFilter', category);
+            localStorage.setItem('fromFilter', from);
+            localStorage.setItem('toFilter', to);
             localStorage.setItem('currentPage', res.data.data.pager.currentPage);
+
+            if (category !== 'All' && !res.data.data.categories.includes(category)) {
+                this.getNotes(from, to, 'All', 1)
+            }
         }).catch(err => {
             console.log(err);
         })
@@ -72,11 +66,7 @@ class NotesMenu extends PureComponent {
             if (res.data !== 'Deleted') {
                 alert(res.data)
             } else {
-                if (this.state.allPages === 1 && this.state.categoryFilter !== 'All' && this.state.notes.length === 1) {
-                    this.setState({categoryFilter: 'All'});
-                    localStorage.setItem('categoryFilter', 'All');
-                }
-                this.getNotes(this.state.fromFilter, this.state.toFilter, this.state.categoryFilter, 1);
+                this.getNotes(this.state.fromFilter, this.state.toFilter, this.state.categoryFilter, this.state.currentPage);
             }
         }).catch(err => {
             console.log(err);
@@ -85,21 +75,18 @@ class NotesMenu extends PureComponent {
 
 
     setFromFilter(event) {
-        localStorage.setItem('fromFilter', event.target.value);
         if (event.target.value !== undefined) {
             this.setState({fromFilter: event.target.value})
         }
     }
 
     setToFilter(event) {
-        localStorage.setItem('toFilter', event.target.value);
         if (event.target.value !== undefined) {
             this.setState({toFilter: event.target.value})
         }
     }
 
     setCategoryFilter(event) {
-        localStorage.setItem('categoryFilter', event.target.value);
         if (event.target.value !== undefined) {
             this.setState({categoryFilter: event.target.value})
         }
@@ -118,15 +105,6 @@ class NotesMenu extends PureComponent {
     }
 
     cancel() {
-        localStorage.setItem('fromFilter', '');
-        localStorage.setItem('toFilter', '');
-        localStorage.setItem('categoryFilter', 'All');
-        this.setState({
-            fromFilter: '',
-            toFilter: '',
-            categoryFilter: 'All',
-            currentPage: 1
-        })
         this.getNotes('','', 'All', 1);
     }
 
