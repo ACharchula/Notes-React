@@ -62,7 +62,11 @@ module.exports = class FileNoteRepository {
         note.content = '';
 
         for (var i = 2; i < lines.length; ++i) {
-            note.content += lines[i]+'\n';
+            if (i+1 === lines.length) {
+                note.content += lines[i];
+            } else {
+                note.content += lines[i]+'\n';
+            }
         }
 
         return note;
