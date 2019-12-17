@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router';
 import axios from 'axios';
+import moment from 'moment';
 
 const api = 'http://localhost:8080/rest_api';
 
@@ -11,7 +12,7 @@ class NoteEditor extends PureComponent {
 
         this.state = {
             title: '',
-            date: '',
+            date: moment().format('YYYY-MM-DD'),
             markdown: false,
             content: '',
             categories: [],

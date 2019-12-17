@@ -111,7 +111,7 @@ class NotesMenu extends PureComponent {
     filter(event) {
         event.preventDefault();
 
-        if ((this.state.fromFilter === '' && this.state.toFilter !== '') || (this. state.fromFilter !== '' && this.state.toFilter === '')) {
+        if ((this.state.fromFilter === '' && this.state.toFilter !== '') || (this.state.fromFilter !== '' && this.state.toFilter === '')) {
             alert('Please insert both dates (from and to) or keep both empty.')
         } else if (this.state.fromFilter !== '' && !moment(this.state.fromFilter, 'YYYY-MM-DD').isSameOrBefore(moment(this.state.toFilter, 'YYYY-MM-DD'))) {
             alert("Please insert 'from' date which is before or equals 'to' date")
